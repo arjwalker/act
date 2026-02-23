@@ -1,0 +1,54 @@
+@model IReadOnlyList<ActViewer.Data.TimelineItemVm>
+
+@if (Model.Count == 0)
+{
+  <div class="muted">No timeline items found.</div>
+}
+else
+{
+  <div class="timeline">
+  @foreach (var t in Model)
+  {
+    <details class="timeline-item">
+      <summary>
+        <span class="badge">
+@(t.Item.ItemType switch
+{
+    "EMAIL" => "📧 Email",
+    "ACTIVITY" => "📅 Activity",
+    "NOTE" => "📝 Note",
+    "HISTORY" => "📞 History",
+    "OPPORTUNITY" => "💰 Opportunity",
+    _ => t.Item.ItemType
+})
+</span>
+
+        <span class="date">@t.Item.ItemDate?.ToString("yyyy-MM-dd HH:mm")</span>
+        <span class="regarding">@t.Item.REGARDING</span>
+      </summary>
+
+      @if (!string.IsNullOrWhiteSpace(t.Item.DETAILS))
+      {
+        <pre class="details">@t.Item.DETAILS</pre>
+      }
+      else
+      {
+        <div class="muted">No details.</div>
+      }
+
+      @if (t.Attachments.Count > 0)
+      {
+        <div class="attachments">
+          <strong>Attachments</strong>
+          <ul>
+          @foreach (var a in t.Attachments)
+          {
+            <li>@(a.DISPLAYNAME ?? a.FILENAME) <span class="muted">(@a.FILEPATH)</span></li>
+          }
+          </ul>
+        </div>
+      }
+    </details>
+  }
+  </div>
+}

@@ -1,0 +1,103 @@
+@page
+@model ActViewer.Pages.Companies.DetailModel
+@{
+    var co = Model.Company!;
+    ViewData["Title"] = co.CompanyName ?? "Company";
+    string addr = string.Join(", ", new[] { co.AddrLine1, co.AddrCity, co.AddrPostcode, co.AddrCountry }
+        .Where(x => !string.IsNullOrWhiteSpace(x)));
+}
+
+<div class="page-header">
+    <div>
+        <a class="btn secondary" href="/Companies">← Back</a>
+        <h1 class="title" style="margin-top:10px;">@co.CompanyName</h1>
+
+        <div class="chips">
+            @if (!string.IsNullOrWhiteSpace(co.PrimaryEmail))
+            {
+                <span class="chip">📧 @co.PrimaryEmail</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(co.PrimaryPhone))
+            {
+                <span class="chip">📞 @co.PrimaryPhone</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(co.CATEGORY))
+            {
+                <span class="chip">🏷️ @co.CATEGORY</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(co.INDUSTRY))
+            {
+                <span class="chip">🏭 @co.INDUSTRY</span>
+            }
+        </div>
+    </div>
+
+    <div class="actions">
+        @if (!string.IsNullOrWhiteSpace(co.WEBADDRESS))
+        {
+            <a class="btn secondary" href="@co.WEBADDRESS" target="_blank" rel="noopener">Website</a>
+        }
+    </div>
+</div>
+
+<div class="two-col">
+    <!-- LEFT COLUMN -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="card">
+            <h2 style="margin:0 0 10px;">Company</h2>
+            <div class="kv">
+                <div class="row"><strong>Category</strong><span>@co.CATEGORY</span></div>
+                <div class="row"><strong>Industry</strong><span>@co.INDUSTRY</span></div>
+                <div class="row"><strong>Website</strong><span>@co.WEBADDRESS</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="margin:0 0 10px;">Primary contact</h2>
+            <div class="kv">
+                <div class="row"><strong>Email</strong><span>@co.PrimaryEmail</span></div>
+                <div class="row"><strong>Phone</strong><span>@co.PrimaryPhone</span></div>
+                <div class="row"><strong>Address</strong><span>@addr</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <h2 style="margin:0;">Contacts</h2>
+                <span class="badge">@Model.Contacts.Count</span>
+            </div>
+
+            @if (Model.Contacts.Count == 0)
+            {
+                <div class="muted" style="margin-top:8px;">No contacts linked to this company.</div>
+            }
+            else
+            {
+                <ul class="list-clean">
+                    @foreach (var c in Model.Contacts)
+                    {
+                        <li>
+                            <a href="/Contacts/Detail?id=@c.CONTACTID"><strong>@c.FULLNAME</strong></a>
+                            @if (!string.IsNullOrWhiteSpace(c.JOBTITLE))
+                            {
+                                <span class="muted"> — @c.JOBTITLE</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 style="margin:0;">Timeline</h2>
+            <span class="muted">Latest activity, history, notes, quotes</span>
+        </div>
+
+        <div style="margin-top:12px;">
+            @await Html.PartialAsync("_Timeline", Model.Timeline)
+        </div>
+    </div>
+</div>

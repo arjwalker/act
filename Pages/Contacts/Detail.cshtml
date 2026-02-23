@@ -1,0 +1,105 @@
+@page
+@model ActViewer.Pages.Contacts.DetailModel
+@{
+    ViewData["Title"] = Model.Contact?.FULLNAME ?? "Contact";
+    var c = Model.Contact!;
+}
+
+<div class="topbar">
+    <a href="/Contacts">← Back to Contacts</a>
+</div>
+
+<h1>@c.FULLNAME</h1>
+
+<div class="cards">
+    <div class="card">
+        <h3>Details</h3>
+        <div><strong>Company (primary):</strong> @c.PrimaryCompanyName</div>
+        <div><strong>Job:</strong> @c.JOBTITLE</div>
+        <div><strong>Dept:</strong> @c.DEPARTMENT</div>
+        <div><strong>Category:</strong> @c.CATEGORY</div>
+        <div><strong>Web:</strong> @c.CONTACTWEBADDRESS</div>
+    </div>
+
+    <div class="card">
+        <h3>Contact</h3>
+        <div><strong>Email:</strong> @c.PrimaryEmail</div>
+        <div><strong>Phone:</strong> @c.PrimaryPhone</div>
+        <div><strong>Address:</strong> @c.AddrLine1, @c.AddrCity, @c.AddrPostcode, @c.AddrCountry</div>
+    </div>
+
+    <div class="card">
+        <h3>Companies linked</h3>
+        @if (Model.Companies.Count == 0)
+        {
+            <div class="muted">None</div>
+        }
+        else
+        {
+            <ul>
+            @foreach (var co in Model.Companies)
+            {
+                <li>@co.CompanyName</li>
+            }
+            </ul>
+        }
+    </div>
+</div>
+<form method="get" class="search" style="margin-top:12px;">
+  <input type="hidden" name="id" value="@c.CONTACTID" />
+
+  <select name="type">
+    <option value="ALL">All</option>
+    <option value="ACTIVITY">Activities</option>
+    <option value="HISTORY">History</option>
+    <option value="NOTE">Notes</option>
+  </select>
+
+  <input type="date" name="from" />
+  <input type="date" name="to" />
+  <button type="submit">Filter</button>
+</form>
+
+<h2>Timeline</h2>
+
+@if (Model.Timeline.Count == 0)
+{
+    <div class="muted">No timeline items found.</div>
+}
+else
+{
+    <div class="timeline">
+    @foreach (var t in Model.Timeline)
+    {
+        <details class="timeline-item">
+            <summary>
+                <span class="badge">@t.Item.ItemType</span>
+                <span class="date">@t.Item.ItemDate?.ToString("yyyy-MM-dd HH:mm")</span>
+                <span class="regarding">@t.Item.REGARDING</span>
+            </summary>
+
+            @if (!string.IsNullOrWhiteSpace(t.Item.DETAILS))
+            {
+                <pre class="details">@t.Item.DETAILS</pre>
+            }
+            else
+            {
+                <div class="muted">No details.</div>
+            }
+
+            @if (t.Attachments.Count > 0)
+            {
+                <div class="attachments">
+                    <strong>Attachments</strong>
+                    <ul>
+                    @foreach (var a in t.Attachments)
+                    {
+                        <li>@(a.DISPLAYNAME ?? a.FILENAME) <span class="muted">(@a.FILEPATH)</span></li>
+                    }
+                    </ul>
+                </div>
+            }
+        </details>
+    }
+    </div>
+}

@@ -1,0 +1,79 @@
+@page
+@model ActViewer.Pages.Contacts.IndexModel
+@{
+    ViewData["Title"] = "Contacts";
+    var hasQuery = !string.IsNullOrWhiteSpace(Model.Q);
+    var count = Model.Results?.Count ?? 0;
+}
+
+<div class="card" style="margin-bottom:12px;">
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <div>
+            <h1 style="margin:0;">Contacts</h1>
+            <div class="muted" style="margin-top:6px;">
+                Search by name, company, email or phone.
+                @if (hasQuery)
+                {
+                    <span>Showing <strong>@count</strong> result@(count == 1 ? "" : "s") for “@Model.Q”.</span>
+                }
+                else
+                {
+                    <span>No results are shown until you search.</span>
+                }
+            </div>
+        </div>
+
+        @if (hasQuery)
+        {
+            <a class="btn secondary" href="/Contacts">Clear</a>
+        }
+    </div>
+
+    <form method="get" class="search" style="margin-bottom:0; margin-top:12px;">
+        <input name="q" value="@Model.Q" placeholder="Search name, company, email, phone..." />
+        <button type="submit" class="btn">Search</button>
+    </form>
+</div>
+
+@if (!hasQuery)
+{
+    <div class="card">
+        <h2 style="margin:0 0 6px;">Search to begin</h2>
+        <div class="muted">Type a name, company, email or phone.</div>
+    </div>
+}
+else if (count == 0)
+{
+    <div class="card">
+        <h2 style="margin:0 0 6px;">No results</h2>
+        <div class="muted">Try a different search term.</div>
+    </div>
+}
+else
+{
+    <table class="grid">
+        <thead>
+            <tr>
+                <th style="width:22%;">Name</th>
+                <th style="width:22%;">Company</th>
+                <th style="width:20%;">Email</th>
+                <th style="width:16%;">Phone</th>
+                <th style="width:12%;">City</th>
+                <th style="width:8%;">Postcode</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var c in Model.Results)
+        {
+            <tr>
+                <td><a href="/Contacts/Detail?id=@c.CONTACTID"><strong>@c.FULLNAME</strong></a></td>
+                <td>@c.PrimaryCompanyName</td>
+                <td>@c.PrimaryEmail</td>
+                <td>@c.PrimaryPhone</td>
+                <td>@c.AddrCity</td>
+                <td>@c.AddrPostcode</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
